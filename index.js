@@ -83,15 +83,27 @@ module.exports = function(ret, pack, settings, opt) {
     });
 
     // 根据 packOrder 排序
+    /*
     fromSettings || (list = list.sort(function(a, b) {
       var a1 = a.packOrder >> 0;
       var b1 = b.packOrder >> 0;
 
       if (a1 === b1) {
-        return list.indexOf(a) - list.indexOf(b);
+        //此处排序有问题，如果packOrder相等，为什么是按照索引进行排序？
+        //排序过程中不是对象的索引位置是会变的！
+        return 0;
+        //return list.indexOf(a) - list.indexOf(b);
       }
 
       return a1 - b1;
+    }));
+    */
+    //Array 的sort方法当数组元素多于10个的时候，会有问题在nodejs 4.1.1中有bug
+    //新版本的chrome中也是有这样的问题，但是其他版本的nodejs有没有问题，没有测试过
+    //[1,2,3,4,5,6,7,8,9,10,11].sort(function(a,b){return 0})
+    //chrome中输出：[6, 1, 3, 4, 5, 2, 7, 8, 9, 10, 11]
+    fromSettings || (list = _.sortBy(list, function (a) {
+      return a.packOrder;
     }));
 
     // sort by dependency
